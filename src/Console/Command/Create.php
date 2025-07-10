@@ -33,7 +33,7 @@ class Create extends AbstractCommand implements ManagerAwareCommandInterface
      *
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $className = $input->getArgument('name');
         if (!$className) {

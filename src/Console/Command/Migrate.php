@@ -30,7 +30,7 @@ class Migrate extends AbstractCommand implements
             );
     }
     
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // version
         $revision = $input->getOption('revision');

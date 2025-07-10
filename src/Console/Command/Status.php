@@ -38,7 +38,7 @@ class Status extends AbstractCommand implements
      *
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // length of list
         $length = $input->getOption('length');

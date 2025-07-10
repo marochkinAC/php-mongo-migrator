@@ -3,8 +3,9 @@
 namespace Sokil\Mongo\Migrator\Event;
 
 use Sokil\Mongo\Migrator\Revision;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class ApplyRevisionEvent extends \Symfony\Component\EventDispatcher\Event
+class ApplyRevisionEvent extends Event
 {
     /**
      *

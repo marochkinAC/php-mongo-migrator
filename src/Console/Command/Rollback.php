@@ -30,7 +30,7 @@ class Rollback extends AbstractCommand implements
             ->setHelp('Rollback to specific revision of database');
     }
     
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // version
         $revision = $input->getOption('revision');

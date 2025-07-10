@@ -6,6 +6,7 @@ use Sokil\Mongo\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Sokil\Mongo\Client;
 use Sokil\Mongo\Migrator\Event\ApplyRevisionEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Migration management
@@ -255,7 +256,7 @@ class Manager
      */
     protected function executeMigration($targetRevision, $environment, $direction)
     {
-        $this->eventDispatcher->dispatch('start');
+        $this->eventDispatcher->dispatch(new Event, 'start');
         
         // get last applied migration
         $latestRevisionId = $this->getLatestAppliedRevisionId($environment);
@@ -265,7 +266,7 @@ class Manager
         
         // execute
         if ($direction === 1) {
-            $this->eventDispatcher->dispatch('before_migrate');
+            $this->eventDispatcher->dispatch(new Event, 'before_migrate');
             
             ksort($availableRevisions);
 
@@ -277,7 +278,7 @@ class Manager
                 $event = new ApplyRevisionEvent();
                 $event->setRevision($revision);
                 
-                $this->eventDispatcher->dispatch('before_migrate_revision', $event);
+                $this->eventDispatcher->dispatch($event, 'before_migrate_revision');
 
                 $revisionPath = $this->getMigrationsDir() . '/' . $revision->getFilename();
                 require_once $revisionPath;
@@ -294,16 +295,16 @@ class Manager
                 
                 $this->logUp($revision->getId(), $environment);
                 
-                $this->eventDispatcher->dispatch('migrate_revision', $event);
+                $this->eventDispatcher->dispatch($event, 'migrate_revision');
                 
                 if ($targetRevision && in_array($targetRevision, array($revision->getId(), $revision->getName()))) {
                     break;
                 }
             }
             
-            $this->eventDispatcher->dispatch('migrate');
+            $this->eventDispatcher->dispatch(new Event, 'migrate');
         } else {
-            $this->eventDispatcher->dispatch('before_rollback');
+            $this->eventDispatcher->dispatch(new Event, 'before_rollback');
             
             // check if nothing to revert
             if (!$latestRevisionId) {
@@ -324,7 +325,7 @@ class Manager
                 $event = new ApplyRevisionEvent();
                 $event->setRevision($revision);
                 
-                $this->eventDispatcher->dispatch('before_rollback_revision', $event);
+                $this->eventDispatcher->dispatch($event, 'before_rollback_revision');
 
                 $revisionPath = $this->getMigrationsDir() . '/' . $revision->getFilename();
                 require_once $revisionPath;
@@ -337,17 +338,17 @@ class Manager
                 
                 $this->logDown($revision->getId(), $environment);
                 
-                $this->eventDispatcher->dispatch('rollback_revision', $event);
+                $this->eventDispatcher->dispatch($event, 'rollback_revision');
                 
                 if (!$targetRevision) {
                     break;
                 }
             }
             
-            $this->eventDispatcher->dispatch('rollback');
+            $this->eventDispatcher->dispatch(new Event, 'rollback');
         }
         
-        $this->eventDispatcher->dispatch('stop');
+        $this->eventDispatcher->dispatch(new Event, 'stop');
         
         // clear cached applied revisions
         unset($this->appliedRevisions[$environment]);
